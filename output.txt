@@ -1,0 +1,27 @@
+Iterations for alpha: 0
+Parameters on iteration 1: -0.000108351	0.00169641	0.000138181
+
+Iterations for alpha: 0
+Parameters on iteration 2: -0.293128	-1.17126	-0.292983
+
+Iterations for alpha: 0
+Parameters on iteration 3: -0.18463	-0.73823	-0.184597
+
+Iterations for alpha: 0
+Parameters on iteration 4: -0.21379	-0.855067	-0.213779
+
+Iterations for alpha: 0
+Parameters on iteration 5: -0.205031	-0.820098	-0.205028
+
+Iterations for alpha: 0
+Parameters on iteration 6: -0.207571	-0.830274	-0.20757
+
+Iterations for alpha: 0
+Parameters on iteration 7: -0.206823	-0.827291	-0.206823
+
+Iterations for alpha: 0
+Parameters on iteration 8: -0.207041	-0.828165	-0.207041
+
+Iterations for alpha: 0
+Parameters on iteration 9: -0.206977	-0.827909	-0.206977
+
