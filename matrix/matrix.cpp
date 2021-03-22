@@ -6,7 +6,7 @@ Matrix::Matrix() {
   num_columns = 0;
 }
 
-Matrix::Matrix(vector<vector<double>> &&elements_) {
+Matrix::Matrix(std::vector<std::vector<double>> &&elements_) {
   elements = elements_;
   num_rows = elements.size();
   num_columns = elements[0].size();
@@ -18,7 +18,7 @@ void Matrix::Reset(int num_rows_, int num_columns_) {
 
   num_rows = num_rows_;
   num_columns = num_columns_;
-  elements.assign(num_rows, vector<double>(num_columns));
+  elements.assign(num_rows, std::vector<double>(num_columns));
 }
 
 int Matrix::GetNumRows() const { return num_rows; }
@@ -187,13 +187,13 @@ Matrix MatrixE(const Matrix &matrix) {
   return result;
 }
 
-Matrix row_matrix(const vector<double> &v) {
+Matrix row_matrix(const std::vector<double> &v) {
   Matrix result(v.size(), 1);
   for (uint16_t i = 0; i < v.size(); i++)
     result[i][0] = v[i];
   return result;
 }
-Matrix column_matrix(const vector<double> &v) {
+Matrix column_matrix(const std::vector<double> &v) {
   Matrix result(1, v.size());
   for (uint16_t i = 0; i < v.size(); i++)
     result[0][i] = v[i];

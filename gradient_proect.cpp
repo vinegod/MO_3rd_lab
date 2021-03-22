@@ -25,28 +25,33 @@ bool epsilon(Matrix lhs, const Matrix& rhs) {
 
 class Proection {
 private:
-    double _x1, _y1, _z1;
+    std::vector<double> _parameters;
+    Matrix _centre;
+    double _radius;
 public:
-    Proection() : _x1(1), _y1(1), _z1(1) {}
-    Proection(double x1, double y1, double z1) : _x1(x1), _y1(y1), _z1(z1) {}
+    Proection() = default;
+    Proection(std::vector<double>&& parameters,
+        Matrix&& centre, double r) :
+        _parameters(parameters), _centre(centre), _radius(r)
+        {}
     auto ProectMatrix(Matrix m) {
-        m[0][0] /= _x1;
-        m[0][1] /= _y1;
-        m[0][2] /= _z1;
+        for (int i = 0; i < m.GetNumColumns(); i++)
+        m[0][i] /= _parameters[i];
         return m;
     }
 
     auto AntiProect(Matrix m) {
-        m[0][0] *= _x1;
-        m[0][1] *= _y1;
-        m[0][2] *= _z1;
+        for (int i =0; i < m.GetNumColumns(); i++)
+        m[0][i] *= _parameters[i];
         return m;
     }
     auto ProectFunc(const auto& func) {
-        return func(_x1, _y1, _z1);
+        return func(_parameters);
     }
-    auto ProectBall (Matrix&& centre, double radius) {
-        return [centre, radius](Matrix vector) {
+    auto ProectBall () {
+        Matrix& centre = _centre;
+        double& radius = _radius;
+        return [&centre, &radius](Matrix vector) {
             return centre + radius*(vector + (-1)*centre)/(Norm(vector + (-1)*centre));
             };
     };
@@ -56,8 +61,9 @@ public:
 void GradientMethod( Matrix&& parameters, const auto& function, const auto& dfunc, auto&& proection)
 {
     auto func = proection.ProectFunc(function);
-    auto ProectBall = proection.ProectBall(Matrix({{0, 0, 0}}), 1);
+    auto ProectBall = proection.ProectBall();
     int i = 0;
+
     Matrix previous_parameters;
     do
     {
@@ -74,11 +80,11 @@ void GradientMethod( Matrix&& parameters, const auto& function, const auto& dfun
 
 int main() {
 
-    auto Func = [](double x1=1, double y1=1, double z1=1) {
-        return [x1, y1, z1](const Matrix& m) -> double {
-            auto x = m[0][0]/x1;
-            auto y = m[0][1]/y1;
-            auto z = m[0][2]/z1;
+    auto Func = [](const std::vector<double>& params) {
+        return [params](const Matrix& m) -> double {
+            auto x = m[0][0]/params[0];
+            auto y = m[0][1]/params[1];
+            auto z = m[0][2]/params[2];
             return x + 4*y + z;
         };
     };
@@ -97,6 +103,6 @@ int main() {
         return result / (2 * h);
     };
 
-    GradientMethod(Matrix({{-110, 1000, 100}}), Func, dFunc, Proection(1, sqrt(3), sqrt(2)));
+    GradientMethod(Matrix({{-10000, 10000, 10000}}), Func, dFunc, Proection({1, sqrt(3), sqrt(2)}, Matrix({{0, 0, 0}}), 1));
     return 0;
 }
