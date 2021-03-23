@@ -34,27 +34,36 @@ public:
         Matrix&& centre, double r) :
         _parameters(parameters), _centre(centre), _radius(r)
         {}
+
     auto ProectMatrix(Matrix m) {
         for (int i = 0; i < m.GetNumColumns(); i++)
-        m[0][i] /= _parameters[i];
+        m[0][i] = m[0][i] / _parameters[i] + _centre[0][i];
         return m;
     }
 
-    auto AntiProect(Matrix m) {
+    /*auto AntiProect(Matrix m) {
         for (int i =0; i < m.GetNumColumns(); i++)
         m[0][i] *= _parameters[i];
         return m;
-    }
+    }*/
+
     auto ProectFunc(const auto& func) {
-        return func(_parameters);
+        return func(_parameters, _centre);
     }
     auto ProectBall () {
-        Matrix& centre = _centre;
         double& radius = _radius;
-        return [&centre, &radius](Matrix vector) {
-            return centre + radius*(vector + (-1)*centre)/(Norm(vector + (-1)*centre));
+        auto& parameters = _parameters;
+        return [&radius, &parameters](Matrix vector) {
+            double sum = 0;
+            for (int i = 0; i < vector.GetNumColumns(); i++) {
+                sum += vector[0][i] * vector[0][i] / parameters[i];
+            }
+            if (sum < radius)
+                return vector;
+            return radius* vector /Norm(vector);
             };
     };
+
 };
 
 
@@ -72,20 +81,23 @@ void GradientMethod( Matrix&& parameters, const auto& function, const auto& dfun
         auto alpha = count_alpha(func, parameters, d_parameters);
         parameters = parameters + (-1)*alpha * d_parameters;
         parameters = ProectBall(parameters);
-        std::cout << "Parameters on iteration " << ++i << ": " << proection.AntiProect(parameters) << '\n';
-    } while( epsilon(parameters, previous_parameters) /*&& (func(parameters) - func(previous_parameters)) > 0.000001*/);
+        std::cout << "Parameters on iteration " << ++i << ": " << proection.ProectMatrix(parameters);
+        //std::cout << "Parameters on iteration " << i << ": " << parameters;
+        std::cout << "Function: " << func(parameters) << "\n\n";
+    } while( epsilon(parameters, previous_parameters) && fabs(func(parameters) - func(previous_parameters)) > 0.0000001);
 
 }
 
 
 int main() {
 
-    auto Func = [](const std::vector<double>& params) {
-        return [params](const Matrix& m) -> double {
-            auto x = m[0][0]/params[0];
-            auto y = m[0][1]/params[1];
-            auto z = m[0][2]/params[2];
-            return x + 4*y + z;
+    auto Func = [](const std::vector<double>& params, const Matrix& centre) {
+        return [params, centre](const Matrix& m) -> double {
+            //std::cout << centre;
+            auto x = (m[0][0])/params[0] + centre[0][0];
+            auto y = (m[0][1])/params[1] + centre[0][1];
+            //auto z = (m[0][2] + centre[0][2])/params[2];
+            return x+y;
         };
     };
 
@@ -102,7 +114,10 @@ int main() {
         }
         return result / (2 * h);
     };
-
-    GradientMethod(Matrix({{-10000, 10000, 10000}}), Func, dFunc, Proection({1, sqrt(3), sqrt(2)}, Matrix({{0, 0, 0}}), 1));
+    //x^2 + 3y^2 +2z^2 <= 1
+    //Matrix({{begin from?}}), Our Func, derivate of func
+    GradientMethod(Matrix({{10'000, 10'000}}), Func, dFunc,
+                    //Proect({{Elispe -> ball}}, Matrix{{coordinates of centre}}, radius of ball)
+                    Proection({1, 1}, Matrix({{1, 0}}), 1));
     return 0;
 }

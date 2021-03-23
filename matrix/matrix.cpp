@@ -202,8 +202,8 @@ Matrix column_matrix(const std::vector<double> &v) {
 
 double Norm(const Matrix& lhs) {
   if (lhs.GetNumRows() == 1)
-    return (lhs*Transp(lhs))[0][0];
+    return sqrt((lhs*Transp(lhs))[0][0]);
   else if (lhs.GetNumColumns() == 1)
-    return (Transp(lhs)*lhs)[0][0];
+    return sqrt((Transp(lhs)*lhs)[0][0]);
   else throw std::invalid_argument("Cant find norm: num rows or columns isnt 1\n");
 }
